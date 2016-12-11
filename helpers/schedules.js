@@ -95,6 +95,8 @@ const conditionalOff = (status) => {
 schedule.scheduleJob('15 8 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0]));
 schedule.scheduleJob('45 19 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [255,0,0]));
 
+flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0])
+
 module.exports = {
 	flashWarn: flashWarn
 }

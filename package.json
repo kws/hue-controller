@@ -10,9 +10,16 @@
   "author": "kaj@k-si.com",
   "license": "Apache-2.0",
   "dependencies": {
+    "body-parser": "~1.15.2",
     "config": "^1.24.0",
-    "express": "^4.14.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.2.0",
+    "express": "~4.14.0",
+    "jade": "~1.11.0",
+    "morgan": "~1.7.0",
     "node-hue-api": "^2.3.0",
-    "node-schedule": "^1.2.0"
+    "node-schedule": "^1.2.0",
+    "parse-color": "^1.0.0",
+    "serve-favicon": "~2.3.0"
   }
 }
