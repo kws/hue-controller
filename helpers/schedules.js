@@ -11,9 +11,9 @@ const DINING_CEILING = 1,
 	  DESK_LAMP = 5,
 	  DINING_UPLIGHT = 6,
 	  TV_LIGHTS = 7,
-	  SOFA_UPLIGHT = 8;		
+	  SOFA_UPLIGHT = 8,
 	  CUPBOARD_TOP = 9,
-	  CUPBOARD_BOTTOM = 10,
+	  CUPBOARD_BOTTOM = 10;
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
