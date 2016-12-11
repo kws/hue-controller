@@ -16,6 +16,17 @@ router.get('/flash/lights/:lights/:colour', function(req, res, next) {
 
 	hue.flashWarn(lights, colour.rgb)
 
+	res.send("OK")
+});
+
+router.get('/info/groups', function(req, res, next) {
+	hue.api.groups()
+		.then((info) => res.send(info))
+});
+
+router.get('/info/lights', function(req, res, next) {
+	hue.api.lights()
+		.then((info) => res.send(info))
 });
 
 module.exports = router;

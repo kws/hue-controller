@@ -4,14 +4,16 @@ var hue = require("node-hue-api"),
     schedule = require('node-schedule'),
     lightState = hue.lightState;
 
-const CUPBOARD_BOTTOM = 10,
-	  CUPBOARD_TOP = 9,
-	  DINING_CEILING = 1,
+const DINING_CEILING = 1,
 	  SOFA_CEILING = 2,
+	  CARS_LIGHTS = 3,
+	  BED = 4,
 	  DESK_LAMP = 5,
 	  DINING_UPLIGHT = 6,
 	  TV_LIGHTS = 7,
 	  SOFA_UPLIGHT = 8;		
+	  CUPBOARD_TOP = 9,
+	  CUPBOARD_BOTTOM = 10,
 
 var displayResult = function(result) {
     console.log(JSON.stringify(result, null, 2));
@@ -93,10 +95,17 @@ const conditionalOff = (status) => {
 
 // Get ready for school alert
 schedule.scheduleJob('15 8 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0]));
+
+// Bedtime
 schedule.scheduleJob('45 19 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [255,0,0]));
 
-flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0])
+// Stop reading
+schedule.scheduleJob('30 20 * * *', () => flashWarn([BED], [0, 0, 255]));
+
+// Notify app start
+flashWarn([DINING_UPLIGHT], [0,255,0])
 
 module.exports = {
+	api: api,
 	flashWarn: flashWarn
 }
