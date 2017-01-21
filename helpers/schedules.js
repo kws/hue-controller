@@ -94,7 +94,7 @@ const conditionalOff = (status) => {
 }
 
 // Get ready for school alert
-schedule.scheduleJob('15 8 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0]));
+schedule.scheduleJob('15 8 * * 1-5', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0]));
 
 // Bedtime
 schedule.scheduleJob('45 19 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [255,0,0]));
