@@ -31,7 +31,11 @@ router.get('/info/lights', function(req, res, next) {
 
 /** Use for testing current TZ settings */
 router.get('/info/time', function(req, res, next) {
-	res.send(new Date())
+	res.send("" + new Date())
+});
+
+router.get('/info/tz', function(req, res, next) {
+	res.send(new Date().getTimezoneOffset())
 });
 
 module.exports = router;
