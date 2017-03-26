@@ -29,4 +29,9 @@ router.get('/info/lights', function(req, res, next) {
 		.then((info) => res.send(info))
 });
 
+/** Use for testing current TZ settings */
+router.get('/info/time', function(req, res, next) {
+	res.send(new Date())
+});
+
 module.exports = router;
