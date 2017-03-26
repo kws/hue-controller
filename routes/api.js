@@ -35,7 +35,7 @@ router.get('/info/time', function(req, res, next) {
 });
 
 router.get('/info/tz', function(req, res, next) {
-	res.send(new Date().getTimezoneOffset())
+	res.send("" + new Date().getTimezoneOffset())
 });
 
 module.exports = router;
