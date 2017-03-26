@@ -1,4 +1,6 @@
-FROM node:6.9.2-alpine
+FROM node:7.7-alpine
+
+RUN apk add -U tzdata
 
 WORKDIR app
 
