@@ -19,6 +19,7 @@
     "morgan": "~1.7.0",
     "node-hue-api": "^2.3.0",
     "node-schedule": "^1.2.0",
+    "node-yaml": "^3.0.3",
     "parse-color": "^1.0.0",
     "serve-favicon": "~2.3.0"
   }

@@ -1,111 +1,62 @@
-var hue = require("node-hue-api"),
+const hue = require("node-hue-api"),
 	config = require("config"),
-    HueApi = hue.HueApi,
+	controller = require("./controller"),
     schedule = require('node-schedule'),
-    lightState = hue.lightState;
-
-const DINING_CEILING = 1,
-	  SOFA_CEILING = 2,
-	  CARS_LIGHTS = 3,
-	  BED = 4,
-	  DESK_LAMP = 5,
-	  DINING_UPLIGHT = 6,
-	  TV_LIGHTS = 7,
-	  SOFA_UPLIGHT = 8,
-	  CUPBOARD_TOP = 9,
-	  CUPBOARD_BOTTOM = 10;
-
-var displayResult = function(result) {
-    console.log(JSON.stringify(result, null, 2));
-};
+	yaml = require("node-yaml"),
+	fs = require("fs")
 
 
-const api = new HueApi(config.hostname, config.username);
+const jobs = {}
 
-const addIdToStatus = (light) => {
-	return api.lightStatus(light).then((status) => 
-		new Promise((accept, reject) => {status.id = light; accept(status)})
-	);
-}
+const loadJobs = () => {
+	let newJobs
+	try {
+		newJobs = yaml.readSync(config.schedulesFile)
+	} catch (e) {
+		console.log("FAILED TO LOAD SCHEDULES")
+		console.log(e)
+		return
+	}
 
-// TODO: Replace this with single call to api.lights()
-const getState = (lights, data) => {
-	if (lights.constructor !== Array) {lights = [lights]}
-	return Promise.all(lights.map((light) => addIdToStatus(light)));
-}
+	// Cancel existing jobs
+	Object.keys(jobs).forEach((key,index) => {
+		let due = jobs[key].job.nextInvocation()
+	    jobs[key].job.cancel();
+	    delete jobs[key]
+		console.log(`Cancelled ${key} that was due at ${due}`)
+	});
 
-const statesToMap = (states) => states.reduce((o,v,i) => {o[v.id] = v; return o}, {});
+	Object.keys(newJobs.schedules).forEach((key,index) => {
+		var job = newJobs.schedules[key]
+		job.job = schedule.scheduleJob(job.cron, () => {
+			controller.execute(key, job)
+		})
+		jobs[key] = job
+		console.log(`Scheduled ${key} next due at ${job.job.nextInvocation()}`)
+	})
 
-const setLow = () => {
-	api.lightStatus(CUPBOARD_TOP).then(conditionalOn).done()
-}
-
-const setOff = () => {
-	api.lightStatus(CUPBOARD_TOP).then(conditionalOff).done()
-}
-
-const flashWarn = (lights, colour) => {
-	getState(lights).then((status) => conditionalWarn(status, colour));
-}
-
-const conditionalWarn = (status, colour=[255,0,0]) => {
-	status = statesToMap(status)
-	const lights = Object.keys(status)
-
-	// Make sure at least one light is on
-	if (lights.reduce((o,v) => o || status[v].state.on, false)) {
-
-		// Return to original state
-		const resetState = () => {
-			Promise.all(lights.map((light) => {
-				const lightState = status[light].state
-				lightState.alert = 'none'
-				api.setLightState(light, lightState)
-			})).then(displayResult)
-		}
-
-		// alert state
-		const state = lightState.create().on().rgb(colour).alert('lselect')
-
-		Promise.all(lights.map((light) => api.setLightState(light, state)))
-			.then(() => setTimeout(resetState, 5000))
+	if (newJobs.instant) {
+		Object.keys(newJobs.instant).forEach((key,index) => {
+			var job = newJobs.instant[key]
+			controller.execute(key, job)
+		})
 	}
 
 }
 
-const conditionalOn = (status) => {
-	console.log("Conditional on", status.state)
-	if (!status.state.on) {
-		console.log("Turning on")
-		state = {on: true, bri: 50, ct: 350}
-		api.setLightState(CUPBOARD_TOP, state).then(displayResult).done()
-		api.setLightState(CUPBOARD_BOTTOM, state).then(displayResult).done()
-	}
+loadJobs()
+let watchTimeout;
+try {
+	fs.watchFile(config.schedulesFile, { persistent: false }, () => {
+	  console.log("File change detected")
+	  clearTimeout(watchTimeout);
+	  watchTimeout = setTimeout(loadJobs, 200);
+	})
+} catch (e) {
+	console.log(`Could not start watching file ${config.configFile}, will not auto reload any schedules. Make sure the file exists`);
+	console.log(e.message);
 }
-
-const conditionalOff = (status) => {
-	console.log("Conditional off", status.state)
-	if (status.state.bri === 50 && status.state.ct === 350 && status.state.colormode === 'ct') {
-		console.log("Turning off")
-		state = {on: false}
-		api.setLightState(CUPBOARD_TOP, state).then(displayResult).done()
-		api.setLightState(CUPBOARD_BOTTOM, state).then(displayResult).done()
-	}
-}
-
-// Get ready for school alert
-schedule.scheduleJob('15 8 * * 1-5', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [0,255,0]));
-
-// Bedtime
-schedule.scheduleJob('45 19 * * *', () => flashWarn([DINING_UPLIGHT,SOFA_UPLIGHT,CUPBOARD_BOTTOM,CUPBOARD_TOP], [255,0,0]));
-
-// Stop reading
-schedule.scheduleJob('30 20 * * *', () => flashWarn([BED], [0, 0, 255]));
-
-// Notify app start
-flashWarn([DINING_UPLIGHT], [0,255,0])
-
 module.exports = {
-	api: api,
-	flashWarn: flashWarn
+	reload: loadJobs,
+	jobs: jobs
 }

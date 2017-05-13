@@ -1,31 +1,45 @@
-var express = require('express');
-var router = express.Router();
-var hue = require('../helpers/schedules');
-var parse = require('parse-color');
+const express = require('express');
+const router = express.Router();
+const controller = require('../helpers/controller');
+const schedules = require('../helpers/schedules')
 
 /* GET users listing. */
 router.get('/flash/lights/:lights/:colour', function(req, res, next) {
-	var lights = req.params.lights;
+	var lights = req.params.lights.split('-');
 	var colour = req.params.colour;
-
-	lights = lights.split('-')
-	colour = parse(colour)
 
 	console.log('Lights', lights)
 	console.log('Colour', colour)
 
-	hue.flashWarn(lights, colour.rgb)
+	var action = {
+		lights,
+		colour,
+		method: 'flash'
+	}
+
+	controller.execute('api',{action})
 
 	res.send("OK")
 });
 
+router.get('/info/schedules', function(req, res, next) {
+	var jobs = schedules.jobs
+	var output = JSON.parse(JSON.stringify(jobs))
+	Object.keys(output).forEach((key) => {
+		var out = output[key]
+		out.next = jobs[key].job.nextInvocation()
+		delete out.job
+	})
+	res.send(output)
+});
+
 router.get('/info/groups', function(req, res, next) {
-	hue.api.groups()
+	controller.api.groups()
 		.then((info) => res.send(info))
 });
 
 router.get('/info/lights', function(req, res, next) {
-	hue.api.lights()
+	controller.api.lights()
 		.then((info) => res.send(info))
 });
 

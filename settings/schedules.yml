@@ -1,0 +1,25 @@
+schedules:
+
+  bedtime:
+    cron: '45 19 * * *'
+    condition:
+      room: Living room
+      status: any_on
+    action:
+      lights:
+        - DINING_UPLIGHT
+        - SOFA_UPLIGHT
+        - CUPBOARD_BOTTOM
+        - CUPBOARD_TOP
+      method: flash
+      colour: red
+
+
+instant: 
+  loadOK:
+    action:
+      lights: DESK_LAMP
+      method: flash
+      colour: magenta   
+
+
