@@ -1,5 +1,24 @@
-schedules:
+# This section is here to easily be able to re-map lights if 
+# they are renamed and moved around. However, numbers or names
+# can also be used in schedules
+lights:
+  # Dining
+  DINING_CEILING: Dining Ceiling
+  DINING_UPLIGHT: Dining Uplight
 
+  # Sofa
+  SOFA_CEILING: Sofa Ceiling
+  SOFA_UPLIGHT: Sofa
+
+  #Cupboard
+  CUPBOARD_TOP: Cupboard Top
+  CUPBOARD_BOTTOM: Cupboard Bottom
+
+  # Others
+  DESK_LAMP: Desk Lamp
+  TV_LIGHTS: TV lights
+
+schedules:
   bedtime:
     cron: '45 19 * * *'
     condition:
@@ -14,7 +33,7 @@ schedules:
       method: flash
       colour: red
 
-
+# These jobs are executed immediately - and can be used for notifying succesful reload of schedules
 instant: 
   loadOK:
     action:

@@ -1,7 +1,6 @@
 var hue = require("node-hue-api"),
 	config = require("config"),
     schedule = require('node-schedule'),
-    roomConfig = require('./roomConfig'),
 	parseColor = require('parse-color'),
     lightState = hue.lightState,
     HueApi = hue.HueApi
@@ -29,21 +28,33 @@ const execute = (key, job) => {
 
 		promise = promise.then(() => api.lights())
 						 .then((info) => {
+						 		var actionLights = job.action.lights
 
-								// Map light names to references (we should use names from state instead?)
-								lights = roomConfig.lights(job.action.lights)
+						 		// // First make sure we're dealing with an array of lights
+					 			if (actionLights.constructor !== Array) {actionLights = [actionLights]}
+
+					 			// Create map of names to lights
+					 			var lightNames = info.lights.reduce((map, light) => {map[light.name] = light; return map}, {})
+
+								// Map light names to IDs (we should use names from state instead?)
+								actionLights = actionLights.map((light) => lightNames[light] ? lightNames[light].id : light)
+
+								// Ids in HUE response are always strings, so make sure even numbers are treated as strings
+								actionLights = actionLights.map((light) => `${light}`)
 
 								// Filter to only the lights we operate on
-								lights = info.lights.filter((light) => lights.indexOf(parseInt(light.id)) >= 0)
+								lights = info.lights.filter((light) => actionLights.indexOf(light.id) >= 0)
 
+								console.log(`Executing job ${key} on ${lights.length} lights.`)
 								switch(job.action.method) {
 									case 'flash':
-										executeFlash(lights, job.action.colour)
+										executeFlash(lights, job)
 										break
 									default:
 										console.log(`Unknown action: ${job.action.method}`)
 								}
 							})
+
 	}
 
 	promise.then(() => {console.log(`Job ${key} complete`)}).catch((err)=>{console.log("Failed:",err)})
@@ -61,15 +72,15 @@ const checkCondition = (condition) => {
 			case 'any_on':
 				return group.state[condition.status] ? Promise.resolve() : Promise.reject(`${condition.status} not met`)
 			case 'all_off':
-				return group.state.any_on ? Promise.reject(`any_on not met`) : Promise.resolve()
+				return group.state.any_on ? Promise.reject(`all_off not met`) : Promise.resolve()
 			default:
 				return Promise.reject('Unmatched condition')
 		}
 	})
 }
 
-const executeFlash = (lights, colour) => {
-	colour = parseColor(colour)
+const executeFlash = (lights, job) => {
+	var colour = parseColor(job.action.colour)
 
 	// Return to original state
 	const resetState = () => {

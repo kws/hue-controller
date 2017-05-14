@@ -8,15 +8,40 @@ const hue = require("node-hue-api"),
 
 const jobs = {}
 
+/*
+	Replaces JOB aliases with real IDs from config.
+*/
+const prepareJob = (job, jobsFile) => {
+	var origLights = job.action.lights
+
+	// Treat as array
+	if (origLights.constructor !== Array) {origLights = [origLights]}
+
+	// Substitute aliases for real values
+	var lights = origLights.map((light) => {
+		return jobsFile.lights && jobsFile.lights[light] ? jobsFile.lights[light] : light
+	})
+
+	job.action.inputLights = job.action.lights
+	job.action.lights = lights
+
+	return job
+}
+
 const loadJobs = () => {
-	let newJobs
+	let jobsFile
 	try {
-		newJobs = yaml.readSync(config.schedulesFile)
+		jobsFile = yaml.readSync(config.schedulesFile)
 	} catch (e) {
 		console.log("FAILED TO LOAD SCHEDULES")
 		console.log(e)
 		return
 	}
+
+	// Rename lights based on internal aliases
+	Object.keys(jobsFile.schedules).forEach((key,index) => {
+		jobsFile.schedules[key] = prepareJob(jobsFile.schedules[key], jobsFile)
+	})
 
 	// Cancel existing jobs
 	Object.keys(jobs).forEach((key,index) => {
@@ -26,8 +51,8 @@ const loadJobs = () => {
 		console.log(`Cancelled ${key} that was due at ${due}`)
 	});
 
-	Object.keys(newJobs.schedules).forEach((key,index) => {
-		var job = newJobs.schedules[key]
+	Object.keys(jobsFile.schedules).forEach((key,index) => {
+		var job = jobsFile.schedules[key]
 		job.job = schedule.scheduleJob(job.cron, () => {
 			controller.execute(key, job)
 		})
@@ -35,10 +60,10 @@ const loadJobs = () => {
 		console.log(`Scheduled ${key} next due at ${job.job.nextInvocation()}`)
 	})
 
-	if (newJobs.instant) {
-		Object.keys(newJobs.instant).forEach((key,index) => {
-			var job = newJobs.instant[key]
-			controller.execute(key, job)
+	if (jobsFile.instant) {
+		Object.keys(jobsFile.instant).forEach((key,index) => {
+			var job = jobsFile.instant[key]
+			controller.execute(key, prepareJob(job, jobsFile))
 		})
 	}
 
