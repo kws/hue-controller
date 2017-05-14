@@ -40,5 +40,6 @@ instant:
       lights: DESK_LAMP
       method: flash
       colour: magenta   
+      timeout: 2000   
 
 

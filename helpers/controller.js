@@ -81,6 +81,7 @@ const checkCondition = (condition) => {
 
 const executeFlash = (lights, job) => {
 	var colour = parseColor(job.action.colour)
+	var timeout = job.action.timeout ? parseInt(job.action.timeout) : 5000
 
 	// Return to original state
 	const resetState = () => {
@@ -90,11 +91,12 @@ const executeFlash = (lights, job) => {
 		}))
 	}
 
-	// alert state
+	// Create the alert state
 	const state = lightState.create().on().rgb(colour.rgb).alert('lselect')
 
+	// Execute chain
 	Promise.all(lights.map((light) => api.setLightState(light.id, state)))
-		.then(() => setTimeout(resetState, 5000))
+		.then(() => setTimeout(resetState, timeout))
 }
 
 module.exports = {
