@@ -47,6 +47,9 @@ const execute = (key, job) => {
 
 								console.log(`Executing job ${key} on ${lights.length} lights.`)
 								switch(job.action.method) {
+									case 'dim':
+										executeDim(lights, job)
+										break
 									case 'flash':
 										executeFlash(lights, job)
 										break
@@ -77,6 +80,22 @@ const checkCondition = (condition) => {
 				return Promise.reject('Unmatched condition')
 		}
 	})
+}
+
+const executeDim = (lights, job) => {
+	const target = job.action.target ? job.action.target : 0;
+	const step = job.action.step ? job.action.step : 10;
+	//For each light that is above the target, reduce the brightness until it hits the target
+	lights.forEach((light) => {
+		if (light.state.on && light.state.bri > target) {
+			const lightTarget = Math.max(target, light.state.bri - step);
+			const newState = Object.assign({}, light.state);
+			newState.bri = lightTarget;
+			console.log(`Reducing ${light.id} from ${light.state.bri} to ${lightTarget}. Target ${target}.`);
+			api.setLightState(light.id, newState);
+		} 
+	});
+
 }
 
 const executeFlash = (lights, job) => {
