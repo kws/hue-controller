@@ -18,7 +18,20 @@ lights:
   DESK_LAMP: Desk Lamp
   TV_LIGHTS: TV lights
 
+  # Bedroom
+  CARS_LIGHT: 3
+  BED: 4
+
 schedules:
+  random:
+    cron: '*/15 * * * * *'
+    action:
+      lights:
+        - CUPBOARD_BOTTOM
+        - CUPBOARD_TOP
+        - DESK_LAMP
+      method: random
+      transition: 15000
   bedtime:
     cron: '45 19 * * *'
     condition:
@@ -32,12 +45,24 @@ schedules:
         - CUPBOARD_TOP
       method: flash
       colour: red
+  dimtest:
+    cron: '* 14-16 * * *'
+    condition:
+      room: Julians Room
+      status: any_on
+    action:
+      lights:
+        - CARS_LIGHT
+        - BED
+      method: dim
+      step: 10
+      target: 35
 
 # These jobs are executed immediately - and can be used for notifying succesful reload of schedules
 instant: 
   loadOK:
     action:
-      lights: DESK_LAMP
+      lights: DINING_UPLIGHT
       method: flash
       colour: magenta   
       timeout: 2000   

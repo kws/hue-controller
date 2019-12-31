@@ -1,9 +1,10 @@
-var hue = require("node-hue-api"),
+const hue = require("node-hue-api"),
 	config = require("config"),
     schedule = require('node-schedule'),
 	parseColor = require('parse-color'),
-    lightState = hue.lightState,
-    HueApi = hue.HueApi
+	convertColor = require('color-convert'),
+	lightState = hue.lightState,
+    HueApi = hue.HueApi;
 
 const api = new HueApi(config.hostname, config.username)
 
@@ -53,6 +54,9 @@ const execute = (key, job) => {
 									case 'flash':
 										executeFlash(lights, job)
 										break
+									case 'random':
+										executeRandom(lights, job)
+										break
 									default:
 										console.log(`Unknown action: ${job.action.method}`)
 								}
@@ -96,6 +100,22 @@ const executeDim = (lights, job) => {
 		} 
 	});
 
+}
+
+const executeRandom = (lights, job) => {
+	const color = Math.floor(Math.random() * 360);
+	const rgb = convertColor.hsv.rgb(color, 100, 100)
+	let newState = lightState.create().on().rgb(rgb).brightness(100)
+
+	if (job.action.transition) {
+		newState = newState.transition(job.action.transition)
+	}
+
+	//For each light that is above the target, reduce the brightness until it hits the target
+	lights.forEach((light) => {
+		console.log(`Setting ${light.id} to ${rgb} / ${color},100,100.`);
+		api.setLightState(light.id, newState);
+	});
 }
 
 const executeFlash = (lights, job) => {
