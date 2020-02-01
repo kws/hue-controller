@@ -203,12 +203,13 @@ cookie@0.4.0:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.4.0.tgz#beb437e7022b3b6d49019d088665303ebe9c14ba"
   integrity sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==
 
-cron-parser@^2.4.0:
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.4.4.tgz#6d3b7e78ff348a88e60d837097540725b77942ae"
+cron-parser@^2.7.3:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.13.0.tgz#6f930bb6f2931790d2a9eec83b3ec276e27a6725"
+  integrity sha512-UWeIpnRb0eyoWPVk+pD3TDpNx3KCFQeezO224oJIkktBrcW6RoAPOx5zIKprZGfk6vcYSmA8yQXItejSaDBhbQ==
   dependencies:
     is-nan "^1.2.1"
-    moment-timezone "^0.5.0"
+    moment-timezone "^0.5.25"
 
 css-parse@1.0.4:
   version "1.0.4"
@@ -546,9 +547,10 @@ mkdirp@~0.5.0:
   dependencies:
     minimist "0.0.8"
 
-moment-timezone@^0.5.0:
-  version "0.5.14"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.14.tgz#4eb38ff9538b80108ba467a458f3ed4268ccfcb1"
+moment-timezone@^0.5.25:
+  version "0.5.27"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.27.tgz#73adec8139b6fe30452e78f210f27b1f346b8877"
+  integrity sha512-EIKQs7h5sAsjhPCqN6ggx6cEbs94GK050254TIJySD1bzoM5JTYDwAU1IoVOeTOL6Gm27kYJ51/uuvq1kIlrbw==
   dependencies:
     moment ">= 2.9.0"
 
@@ -597,11 +599,12 @@ node-hue-api@^4.0.5:
     bottleneck "^2.19.5"
     get-ssl-certificate "^2.3.3"
 
-node-schedule@^1.2.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/node-schedule/-/node-schedule-1.3.0.tgz#e7a7e816a7f2550d5b170bd106e765db28bdf030"
+node-schedule@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/node-schedule/-/node-schedule-1.3.2.tgz#d774b383e2a6f6ade59eecc62254aea07cd758cb"
+  integrity sha512-GIND2pHMHiReSZSvS6dpZcDH7pGPGFfWBIEud6S00Q8zEIzAs9ommdyRK1ZbQt8y1LyZsJYZgPnyi7gpU2lcdw==
   dependencies:
-    cron-parser "^2.4.0"
+    cron-parser "^2.7.3"
     long-timeout "0.1.1"
     sorted-array-functions "^1.0.0"
 

@@ -22,7 +22,22 @@ lights:
   CARS_LIGHT: 3
   BED: 4
 
-schedules: []
+schedules:
+  colour:
+    cron: '*/1 * * * * *'
+    action:
+      method: colour
+      colours:
+        - red
+        - blue
+      lights:
+        - CUPBOARD_BOTTOM
+        - CUPBOARD_TOP
+        - SOFA_CEILING
+        - DINING_CEILING
+        - DINING_UPLIGHT
+        - SOFA_UPLIGHT
+
 #  random:
 #    cron: '*/1 * * * * *'
 #    action:

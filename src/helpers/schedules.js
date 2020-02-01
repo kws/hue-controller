@@ -29,6 +29,7 @@ const prepareJob = (job, jobsFile) => {
 };
 
 const execute = (key, job) => {
+    job.invocation++;
     controller.execute(key, job).then(
         // do something?
     ).catch(err => {
@@ -62,9 +63,10 @@ const loadJobs = () => {
 
     Object.keys(jobsFile.schedules).forEach((key, index) => {
         let job = jobsFile.schedules[key];
-        job.job = schedule.scheduleJob(job.cron, () => {
+        job.job = schedule.scheduleJob(key, job.cron, () => {
             execute(key, job)
         });
+        job.invocation = 0
         jobs[key] = job;
         console.log(`Scheduled ${key} next due at ${job.job.nextInvocation()}`)
     });

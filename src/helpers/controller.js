@@ -54,23 +54,31 @@ const execute = async (key, job) => {
 			return map
 		}, {});
 
-		// Map light names to IDs (we should use names from state instead?)
-		actionLights = actionLights.map((light) => lightNames[light] ? lightNames[light].id : light);
+		// Look up light objects
+		actionLights = actionLights.map(light => lightNames[light] ? lightNames[light] : light);
 
-		// Filter to only the lights we operate on
-		lights = lights.filter((light) => actionLights.indexOf(light.id) >= 0);
+		// Filter any that we didn't find
+		const missingLights = actionLights.filter(light => typeof(light) === 'string');
+		actionLights = actionLights.filter(light => typeof(light) !== 'string');
 
-		console.log(`Executing job ${key} on ${lights.length} lights.`);
+		if (missingLights) {
+			console.warn(`Could not resolve the following light names: ${missingLights}`)
+		}
+
+		console.log(`Executing job ${key} on ${actionLights.length} lights.`);
 
 		switch (job.action.method) {
+			case 'colour':
+				await executeColour(actionLights, job);
+				break;
 			case 'dim':
-				await executeDim(lights, job);
+				await executeDim(actionLights, job);
 				break;
 			case 'flash':
-				await executeFlash(lights, job);
+				await executeFlash(actionLights, job);
 				break;
 			case 'random':
-				await executeRandom(lights, job);
+				await executeRandom(actionLights, job);
 				break;
 			default:
 				console.log(`Unknown action: ${job.action.method}`)
@@ -153,6 +161,19 @@ const executeFlash = async (lights, job) => {
 	await Promise.all(lights.map((light) => api.lights.setLightState(light.id, state)))
 		.then(() => setTimeout(resetState, timeout))
 };
+
+const executeColour = async (lights, job) => {
+	const api = await getApi();
+	const colours = job.action.colours.map(c => parseColor(c))
+	const groups = job.action.groups ? job.action.groups : lights.length
+
+	await Promise.all(lights.map((light, ix) => {
+		ix = ix % groups
+		const c = colours[(job.invocation + ix) % colours.length]
+		console.log(`Setting light ${light.name} (${light.id}) to ${c.rgb}`)
+		api.lights.setLightState(light.id, {on: true, rgb: c.rgb})
+	}));
+}
 
 export default {
 	api: getApi,
