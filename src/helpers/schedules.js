@@ -35,7 +35,7 @@ const execute = (key, job) => {
             console.log(`Could not execute job "${key}":`, err)
         }
     )
-}
+};
 
 const loadJobs = () => {
     let jobsFile;
@@ -54,9 +54,9 @@ const loadJobs = () => {
 
     // Cancel existing jobs
     Object.keys(jobs).forEach((key, index) => {
-        let due = jobs[key].job.nextInvocation()
+        let due = jobs[key].job.nextInvocation();
         jobs[key].job.cancel();
-        delete jobs[key]
+        delete jobs[key];
         console.log(`Cancelled ${key} that was due at ${due}`)
     });
 

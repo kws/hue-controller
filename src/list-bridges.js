@@ -5,11 +5,11 @@ const displayBridges = function(bridges) {
 };
 
 const searchBridges = async () => {
-	const bridges = await hue.v3.discovery.nupnpSearch()
+	const bridges = await hue.v3.discovery.nupnpSearch();
 	return bridges
-}
+};
 
-searchBridges().then(displayBridges)
+searchBridges().then(displayBridges);
 
 
 

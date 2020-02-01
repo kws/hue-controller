@@ -4,7 +4,7 @@ import parseColor from "parse-color";
 import convertColor from "color-convert";
 
 const hueApi = hue.v3.api;
-const LightState = hue.v3.lightStates.LightState
+const LightState = hue.v3.lightStates.LightState;
 
 let __api;
 const getApi = async () => {
@@ -52,56 +52,56 @@ const execute = async (key, job) => {
 		const lightNames = lights.reduce((map, light) => {
 			map[light.name] = light;
 			return map
-		}, {})
+		}, {});
 
 		// Map light names to IDs (we should use names from state instead?)
-		actionLights = actionLights.map((light) => lightNames[light] ? lightNames[light].id : light)
+		actionLights = actionLights.map((light) => lightNames[light] ? lightNames[light].id : light);
 
 		// Filter to only the lights we operate on
-		lights = lights.filter((light) => actionLights.indexOf(light.id) >= 0)
+		lights = lights.filter((light) => actionLights.indexOf(light.id) >= 0);
 
-		console.log(`Executing job ${key} on ${lights.length} lights.`)
+		console.log(`Executing job ${key} on ${lights.length} lights.`);
 
 		switch (job.action.method) {
 			case 'dim':
-				await executeDim(lights, job)
-				break
+				await executeDim(lights, job);
+				break;
 			case 'flash':
-				await executeFlash(lights, job)
-				break
+				await executeFlash(lights, job);
+				break;
 			case 'random':
-				await executeRandom(lights, job)
-				break
+				await executeRandom(lights, job);
+				break;
 			default:
 				console.log(`Unknown action: ${job.action.method}`)
 		}
 
 	}
-}
+};
 
 const checkCondition = async condition => {
-	const api = await getApi()
+	const api = await getApi();
 	let groups = await api.groups.getAll();
-	groups = groups.filter((group) => group.name.toUpperCase() === condition.room.toUpperCase())
+	groups = groups.filter((group) => group.name.toUpperCase() === condition.room.toUpperCase());
 	if (groups.length === 0) {
-		console.log(`Room ${condition.room} not found for condition. Failing.`)
+		console.log(`Room ${condition.room} not found for condition. Failing.`);
 		return false
 	}
 
-	const group = groups[0]
+	const group = groups[0];
 	switch(condition.status) {
 		case 'all_on':
 		case 'any_on':
-			return group.state[condition.status]
+			return group.state[condition.status];
 		case 'all_off':
-			return !group.state.any_on
+			return !group.state.any_on;
 		default:
 			return false
 		}
-}
+};
 
 const executeDim = async (lights, job) => {
-	const api = await getApi()
+	const api = await getApi();
 	const target = job.action.target ? job.action.target : 0;
 	const step = job.action.step ? job.action.step : 10;
 	//For each light that is above the target, reduce the brightness until it hits the target
@@ -113,13 +113,13 @@ const executeDim = async (lights, job) => {
 		} 
 	}));
 
-}
+};
 
 const executeRandom = async (lights, job) => {
-	const api = await getApi()
+	const api = await getApi();
 	const color = Math.floor(Math.random() * 360);
-	const rgb = convertColor.hsv.rgb(color, 100, 100)
-	let newState = new LightState().on().rgb(rgb).brightness(100)
+	const rgb = convertColor.hsv.rgb(color, 100, 100);
+	let newState = new LightState().on().rgb(rgb).brightness(100);
 
 	if (job.action.transition) {
 		newState = newState.transition(job.action.transition)
@@ -129,30 +129,30 @@ const executeRandom = async (lights, job) => {
 	await Promise.all(lights.map((light) =>
 		api.lights.setLightState(light.id, newState)
 	));
-}
+};
 
 const executeFlash = async (lights, job) => {
-	const api = await getApi()
-	const colour = parseColor(job.action.colour)
-	const timeout = job.action.timeout ? parseInt(job.action.timeout) : 5000
+	const api = await getApi();
+	const colour = parseColor(job.action.colour);
+	const timeout = job.action.timeout ? parseInt(job.action.timeout) : 5000;
 
-	const originalStates = lights.map(light => {return {id: light.id, state: light.state}})
+	const originalStates = lights.map(light => {return {id: light.id, state: light.state}});
 
 	// Return to original state
 	const resetState = () => {
 		Promise.all(originalStates.map((light) => {
-			light.state.alert = 'none'
+			light.state.alert = 'none';
 			api.lights.setLightState(light.id, light.state)
 		}))
-	}
+	};
 
 	// Create the alert state
-	const state = new LightState().on().rgb(colour.rgb).alert('lselect')
+	const state = new LightState().on().rgb(colour.rgb).alert('lselect');
 
 	// Execute chain
 	await Promise.all(lights.map((light) => api.lights.setLightState(light.id, state)))
 		.then(() => setTimeout(resetState, timeout))
-}
+};
 
 export default {
 	api: getApi,
