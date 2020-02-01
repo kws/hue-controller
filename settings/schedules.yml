@@ -22,43 +22,42 @@ lights:
   CARS_LIGHT: 3
   BED: 4
 
-schedules:
-  random:
-    cron: '*/15 * * * * *'
-    action:
-      lights:
-        - CUPBOARD_BOTTOM
-        - CUPBOARD_TOP
-        - DESK_LAMP
-      method: random
-      transition: 15000
-  bedtime:
-    cron: '45 19 * * *'
-    condition:
-      room: Living room
-      status: any_on
-    action:
-      lights:
-        - DINING_UPLIGHT
-        - SOFA_UPLIGHT
-        - CUPBOARD_BOTTOM
-        - CUPBOARD_TOP
-      method: flash
-      colour: red
-  dimtest:
-    cron: '* 14-16 * * *'
-    condition:
-      room: Julians Room
-      status: any_on
-    action:
-      lights:
-        - CARS_LIGHT
-        - BED
-      method: dim
-      step: 10
-      target: 35
+schedules: []
+#  random:
+#    cron: '*/1 * * * * *'
+#    action:
+#      lights:
+#        - CUPBOARD_BOTTOM
+#        - CUPBOARD_TOP
+#        - DESK_LAMP
+#      method: random
+#      transition: 1000
+#  dim:
+#    cron: '*/1 * * * * *'
+#    condition:
+#      room: Living room
+#      status: any_on
+#    action:
+#      lights:
+#        - CUPBOARD_BOTTOM
+#        - CUPBOARD_TOP
+#      method: dim
+#      step: 10
+#      target: 10
+#  dimtest:
+#    cron: '* 14-16 * * *'
+#    condition:
+#      room: Julians Room
+#      status: any_on
+#    action:
+#      lights:
+#        - CARS_LIGHT
+#        - BED
+#      method: dim
+#      step: 10
+#      target: 35
 
-# These jobs are executed immediately - and can be used for notifying succesful reload of schedules
+# These jobs are executed immediately - and can be used for notifying successful reload of schedules
 instant: 
   loadOK:
     action:

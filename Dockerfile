@@ -1,4 +1,4 @@
-FROM node:12.14-alpine
+FROM node:13.2-alpine
 
 RUN apk add -U tzdata
 
@@ -6,17 +6,11 @@ WORKDIR app
 
 COPY package.json package.json
 
-RUN npm install --prod
+RUN yarn install --frozen
 
 ADD bin bin
-ADD config config
-ADD helpers helpers
-ADD public public
-ADD routes routes
-ADD views views
+ADD src src
 ADD settings settings
-
-COPY app.js app.js
 
 RUN mv settings /settings ; ln -s /settings settings
 
@@ -27,4 +21,4 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 EXPOSE 3000
 
-CMD ["bin/www"]
+CMD ["yarn","start"]
