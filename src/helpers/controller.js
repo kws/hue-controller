@@ -2,6 +2,7 @@ import hue from "node-hue-api";
 import config from "../config/index.js";
 import parseColor from "parse-color";
 import convertColor from "color-convert";
+import colorTemperature from 'color-temperature';
 
 const hueApi = hue.v3.api;
 const LightState = hue.v3.lightStates.LightState;
@@ -16,10 +17,6 @@ const getApi = async () => {
 	return __api;
 };
 
-
-const displayResult = result => {
-    console.log(JSON.stringify(result, null, 2));
-};
 
 const execute = async (key, job) => {
 	let api;
@@ -61,7 +58,7 @@ const execute = async (key, job) => {
 		const missingLights = actionLights.filter(light => typeof(light) === 'string');
 		actionLights = actionLights.filter(light => typeof(light) !== 'string');
 
-		if (missingLights) {
+		if (missingLights.length>0) {
 			console.warn(`Could not resolve the following light names: ${missingLights}`)
 		}
 
@@ -164,16 +161,46 @@ const executeFlash = async (lights, job) => {
 
 const executeColour = async (lights, job) => {
 	const api = await getApi();
-	const colours = job.action.colours.map(c => parseColor(c))
-	const groups = job.action.groups ? job.action.groups : lights.length
+	const groups = job.action.groups ? job.action.groups : lights.length;
+
+	let colours = job.action.colours.map(c => {
+		if (c === 'random') {
+			const hsv = Math.floor(Math.random() * 360);
+			c = '#' + convertColor.hsv.hex(hsv, 100, 100);
+		}
+		return c;
+	});
+	colours = colours.map(c => parseColor(c));
 
 	await Promise.all(lights.map((light, ix) => {
-		ix = ix % groups
-		const c = colours[(job.invocation + ix) % colours.length]
-		console.log(`Setting light ${light.name} (${light.id}) to ${c.rgb}`)
-		api.lights.setLightState(light.id, {on: true, rgb: c.rgb})
+		ix = ix % groups;
+		const c = colours[(job.invocation + ix) % colours.length];
+
+		let state = new LightState()
+
+		if (!light.state.on) {
+			if (job.action.on) {
+				state = state.on();
+			} else {
+				return Promise.resolve();
+			}
+		}
+
+		if (job.action.brightness) {
+			state = state.brightness(job.action.brightness);
+		}
+
+		if (light.state.colormode === "xy") {
+			state = state.rgb(c.rgb)
+		}
+
+		if (job.action.transition) {
+			state = state.transition(job.action.transition)
+		}
+
+		return api.lights.setLightState(light.id, state)
 	}));
-}
+};
 
 export default {
 	api: getApi,

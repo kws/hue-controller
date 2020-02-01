@@ -11,8 +11,12 @@
   "repository": "git+https://github.com/kws/hue-controller.git",
   "author": "kaj@k-si.com",
   "license": "Apache-2.0",
+  "devDependencies": {
+  },
   "dependencies": {
     "body-parser": "~1.15.2",
+    "color-convert": "latest",
+    "color-temperature": "^0.2.7",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "express": "~4.17.1",
@@ -22,8 +26,7 @@
     "node-schedule": "^1.3.2",
     "node-yaml": "^3.0.3",
     "parse-color": "^1.0.0",
-    "serve-favicon": "~2.3.0",
-    "color-convert": "latest",
-    "process": "latest"
+    "process": "latest",
+    "serve-favicon": "~2.3.0"
   }
 }

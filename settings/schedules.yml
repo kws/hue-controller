@@ -22,21 +22,30 @@ lights:
   CARS_LIGHT: 3
   BED: 4
 
+  KITCHEN_1: Kitchen 1
+  KITCHEN_2: Kitchen 2
+  KITCHEN_3: Kitchen 3
+  KITCHEN_4: Kitchen 4
+  KITCHEN_R: Kitchen Cupboard Right
+  KITCHEN_L: Kitchen Cupboard Left
+
 schedules:
+
   colour:
-    cron: '*/1 * * * * *'
+    cron: '*/5 * * * * *'
     action:
       method: colour
+#      on: true
+#      brightness: 100
+#      groups: 2
       colours:
-        - red
-        - blue
+        - sky
+        - yellow
       lights:
         - CUPBOARD_BOTTOM
         - CUPBOARD_TOP
-        - SOFA_CEILING
-        - DINING_CEILING
-        - DINING_UPLIGHT
-        - SOFA_UPLIGHT
+      transition: 250
+
 
 #  random:
 #    cron: '*/1 * * * * *'
