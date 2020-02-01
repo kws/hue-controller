@@ -2,7 +2,7 @@ import hue from "node-hue-api";
 import config from "../config/index.js";
 import parseColor from "parse-color";
 import convertColor from "color-convert";
-import colorTemperature from 'color-temperature';
+import { poll } from "./sensors.js";
 
 const hueApi = hue.v3.api;
 const LightState = hue.v3.lightStates.LightState;
@@ -62,7 +62,7 @@ const execute = async (key, job) => {
 			console.warn(`Could not resolve the following light names: ${missingLights}`)
 		}
 
-		console.log(`Executing job ${key} on ${actionLights.length} lights.`);
+		// console.log(`Executing job ${key} on ${actionLights.length} lights.`);
 
 		switch (job.action.method) {
 			case 'colour':
@@ -76,6 +76,9 @@ const execute = async (key, job) => {
 				break;
 			case 'random':
 				await executeRandom(actionLights, job);
+				break;
+			case 'pollSensors':
+				await poll();
 				break;
 			default:
 				console.log(`Unknown action: ${job.action.method}`)

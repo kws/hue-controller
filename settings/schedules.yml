@@ -30,6 +30,10 @@ lights:
   KITCHEN_L: Kitchen Cupboard Left
 
 schedules:
+  sensors:
+    cron: '* * * * * *'
+    action:
+      method: pollSensors
 
   colour:
     cron: '*/5 * * * * *'

@@ -11,6 +11,9 @@ const jobs = {};
 */
 const prepareJob = (job, jobsFile) => {
     let origLights = job.action.lights;
+    if (origLights === undefined) {
+        origLights = job.action.lights = []
+    }
 
     // Treat as array
     if (origLights.constructor !== Array) {
