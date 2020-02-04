@@ -25,7 +25,8 @@ export default class CSVLogger {
             const filename = this.filename.replace("%date%", dateFormat(new Date(), "yyyy-mm-dd"));
             fs.appendFile(filename, msg, function (err) {
                 if (err) {
-                    console.log(`{err}: Could not log ${msg}`)
+                    console.err(`${err.message}: Could not log ${msg} to ${filename}`)
+                    console.err(err)
                 }
             });
         }
