@@ -11,13 +11,13 @@
   "repository": "git+https://github.com/kws/hue-controller.git",
   "author": "kaj@k-si.com",
   "license": "Apache-2.0",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "body-parser": "~1.15.2",
     "color-convert": "latest",
     "color-temperature": "^0.2.7",
     "cookie-parser": "~1.4.3",
+    "dateformat": "^3.0.3",
     "debug": "^4.1.1",
     "express": "~4.17.1",
     "jade": "~1.11.0",

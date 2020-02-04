@@ -1,4 +1,5 @@
 import fs from 'fs';
+import dateFormat from 'dateformat';
 
 export default class CSVLogger {
     constructor(filename) {
@@ -21,7 +22,8 @@ export default class CSVLogger {
             msg = (`${s.lastupdated},${s.id},${s.name},lightlevel,${s.lightlevel},,${s.dark},${s.daylight}\n`);
         }
         if (msg) {
-            fs.appendFile(this.filename, msg, function (err) {
+            const filename = this.filename.replace("%date%", dateFormat(new Date(), "yyyy-mm-dd"));
+            fs.appendFile(filename, msg, function (err) {
                 if (err) {
                     console.log(`{err}: Could not log ${msg}`)
                 }
