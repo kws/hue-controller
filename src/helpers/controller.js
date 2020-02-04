@@ -48,6 +48,7 @@ const execute = async (key, job) => {
 		// Create map of names to lights
 		const lightNames = lights.reduce((map, light) => {
 			map[light.name] = light;
+			map[light.id] = light;
 			return map
 		}, {});
 
@@ -114,11 +115,13 @@ const executeDim = async (lights, job) => {
 	const step = job.action.step ? job.action.step : 10;
 	//For each light that is above the target, reduce the brightness until it hits the target
 	await Promise.all(lights.map((light) => {
-		if (light.state.on && light.state.bri > target) {
+		const promises = []
+		if (light.state && light.state.on && light.state.bri > target) {
 			const lightTarget = Math.max(target, light.state.bri - step);
-			console.log(`Reducing ${light.id} from ${light.state.bri} to ${lightTarget}. Target ${target}.`);
-			api.lights.setLightState(light.id, {'bri': lightTarget});
-		} 
+			console.log(`Reducing ${light.name} from ${light.state.bri} to ${lightTarget}. Target ${target}.`);
+			promises.push(api.lights.setLightState(light.id, {'bri': lightTarget}));
+		}
+		return promises;
 	}));
 
 };
