@@ -1,15 +1,17 @@
 import controller from './controller.js'
+import config from "../config/index.js";
+import CSVLogger from "./csvlogger.js";
 
-const statusMap = {}
-const listeners = []
+const statusMap = {};
+const listeners = [];
 
 export const addListener = listener => {
     listeners.push(listener);
-}
+};
 
 const fireChange = async sensor => {
     return Promise.all(listeners.map(l => l(sensor)))
-}
+};
 
 const displayBrief = s => {
     if (s.type === "Daylight") {
@@ -29,7 +31,7 @@ const displayBrief = s => {
 
 
 export const display = s => {
-    console.log(`\n${s.id} ${s.type} ${s.name}`)
+    console.log(`\n${s.id} ${s.type} ${s.name}`);
     if (s.type === "Daylight") {
         console.log(`  ${s.daylight} ${s.lat} ${s.long} ${s.sunriseoffset} ${s.sunsetoffset} ${s.lastupdated}`)
     } else if (s.type === "CLIPGenericStatus") {
@@ -52,7 +54,7 @@ export const display = s => {
 };
 
 export const poll = async () => {
-    const api = await controller.api()
+    const api = await controller.api();
     const sensors = await api.sensors.getAll();
 
     sensors.forEach(s => {
@@ -62,7 +64,10 @@ export const poll = async () => {
             fireChange(s, oldValue)
         }
     })
+};
+
+addListener(displayBrief);
+
+if (config.iotLog) {
+    addListener(new CSVLogger(config.iotLog).log);
 }
-
-addListener(displayBrief)
-

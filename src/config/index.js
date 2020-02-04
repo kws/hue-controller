@@ -1,6 +1,7 @@
 import path from "path";
 import process from "process";
 import hue from "node-hue-api";
+
 const { pathname } = new URL(import.meta.url);
 
 
@@ -25,6 +26,7 @@ const getHostName = async () => {
 export default {
   hostname: getHostName,
   username: process.env.HUE_USERNAME,
-  configFile: process.env.CONFIG_FILE || path.join(pathname,'../../../settings/config.yml'),
-  schedulesFile: process.env.CONFIG_FILE || path.join(pathname,'../../../settings/schedules.yml')
+  configFile: process.env.CONFIG_FILE || path.join(pathname, '../../../settings/config.yml'),
+  schedulesFile: process.env.CONFIG_FILE || path.join(pathname, '../../../settings/schedules.yml'),
+  iotLog: process.env.IOT_LOG
 };
