@@ -1,5 +1,9 @@
 import fs from 'fs';
+import os from 'os';
 import dateFormat from 'dateformat';
+
+// optional values in csv
+const o = o => o ? o : '';
 
 export default class CSVLogger {
     constructor(filename) {
@@ -7,25 +11,36 @@ export default class CSVLogger {
     }
 
     log = s => {
-        let msg;
+        // date,id,name,type,value,battery,dark,daylight
+        const msg = {"date": s.lastupdated, "id": s.id, "name": s.name};
         if (s.type === "Daylight") {
-            msg = (`${s.lastupdated},${s.id},${s.name},daylight,${s.daylight},,,${s.daylight}\n`);
-        } else if (s.type === "ZGPSwitch") {
-            msg = (`${s.lastupdated},${s.id},${s.name},button,${s.buttonevent}\n`);
-        } else if (s.type === "ZLLSwitch") {
-            msg = (`${s.lastupdated},${s.id},${s.name},button,${s.buttonevent},${s.battery}\n`);
+            msg.type = "daylight";
+            msg.value = s.daylight;
+            msg.daylight = s.daylight;
+        } else if (s.type === "ZGPSwitch" || s.type === "ZLLSwitch") {
+            msg.type = "button";
+            msg.value = s.buttonevent;
+            msg.battery = s.battery;
         } else if (s.type === "ZLLTemperature") {
-            msg = (`${s.lastupdated},${s.id},${s.name},temperature,${s.temperature / 100}\n`);
+            msg.type = "temperature";
+            msg.value = s.temperature / 100;
         } else if (s.type === "ZLLPresence") {
-            msg = (`${s.lastupdated},${s.id},${s.name},presence,${s.presence},${s.battery}\n`);
+            msg.type = "presence";
+            msg.value = s.presence;
+            msg.battery = s.battery;
         } else if (s.type === "ZLLLightLevel") {
-            msg = (`${s.lastupdated},${s.id},${s.name},lightlevel,${s.lightlevel},,${s.dark},${s.daylight}\n`);
+            msg.type = "lightlevel";
+            msg.value = s.lightlevel;
+            msg.dark = s.dark;
+            msg.daylight = s.daylight;
         }
-        if (msg) {
+        if (msg.type) {
+            const msgStr = `${msg.date},${msg.id},${msg.name},${msg.type},${msg.value}` +
+                `,${o(msg.battery)},${o(msg.dark)},${o(msg.daylight)},${os.hostname()}\n`;
             const filename = this.filename.replace("%date%", dateFormat(new Date(), "yyyy-mm-dd"));
-            fs.appendFile(filename, msg, function (err) {
+            fs.appendFile(filename, msgStr, function (err) {
                 if (err) {
-                    console.err(`${err.message}: Could not log ${msg} to ${filename}`)
+                    console.err(`${err.message}: Could not log ${msgStr} to ${filename}`)
                     console.err(err)
                 }
             });
