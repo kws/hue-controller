@@ -3,6 +3,7 @@ import config from "../config/index.js";
 import parseColor from "parse-color";
 import convertColor from "color-convert";
 import { poll } from "./sensors.js";
+import { generateColors } from "./colors.js";
 
 const hueApi = hue.v3.api;
 const LightState = hue.v3.lightStates.LightState;
@@ -169,14 +170,7 @@ const executeColour = async (lights, job) => {
 	const api = await getApi();
 	const groups = job.action.groups ? job.action.groups : lights.length;
 
-	let colours = job.action.colours.map(c => {
-		if (c === 'random') {
-			const hsv = Math.floor(Math.random() * 360);
-			c = '#' + convertColor.hsv.hex(hsv, 100, 100);
-		}
-		return c;
-	});
-	colours = colours.map(c => parseColor(c));
+	const colours = generateColors(job.action.colours);
 
 	await Promise.all(lights.map((light, ix) => {
 		ix = ix % groups;
