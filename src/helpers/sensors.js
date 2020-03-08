@@ -1,6 +1,8 @@
+import uuid from 'uuid';
 import controller from './controller.js'
 import config from "../config/index.js";
-import CSVLogger from "./csvlogger.js";
+import CSVLogger from "../loggers/csv.js";
+import SQLiteLogger from "../loggers/sqlite.js";
 
 const statusMap = {};
 const listeners = [];
@@ -58,6 +60,7 @@ export const poll = async () => {
     const sensors = await api.sensors.getAll();
 
     sensors.forEach(s => {
+        s.event_id = uuid.v4();
         const oldValue = statusMap[s.id];
         statusMap[s.id] = s;
         if (!oldValue || oldValue.lastupdated !== s.lastupdated) {
@@ -70,4 +73,7 @@ addListener(displayBrief);
 
 if (config.iotLog) {
     addListener(new CSVLogger(config.iotLog).log);
+}
+if (config.dbURL) {
+    addListener(new SQLiteLogger(config.dbURL).log);
 }

@@ -11,7 +11,6 @@
   "repository": "git+https://github.com/kws/hue-controller.git",
   "author": "kaj@k-si.com",
   "license": "Apache-2.0",
-  "devDependencies": {},
   "dependencies": {
     "body-parser": "~1.15.2",
     "color-convert": "latest",
@@ -27,7 +26,9 @@
     "node-yaml": "^3.0.3",
     "parse-color": "^1.0.0",
     "process": "latest",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "sqlite3": "^4.1.1",
+    "uuid": "~7.0.2"
   },
   "resolutions": {
     "clean-css": "^4.1.11",

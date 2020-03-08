@@ -28,5 +28,6 @@ export default {
   username: process.env.HUE_USERNAME,
   configFile: process.env.CONFIG_FILE || path.join(pathname, '../../../settings/config.yml'),
   schedulesFile: process.env.CONFIG_FILE || path.join(pathname, '../../../settings/schedules.yml'),
-  iotLog: process.env.IOT_LOG
+  iotLog: process.env.IOT_LOG,
+  dbURL: process.env.IOT_DB_URL,
 };
