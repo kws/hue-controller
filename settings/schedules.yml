@@ -44,6 +44,8 @@ schedules:
     cron: '*/5 * * * * *'
     action:
       method: rotate
+      step: 45
+      length: 10
       lights:
         - SOFA_1
         - SOFA_2

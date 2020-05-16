@@ -207,21 +207,22 @@ const executeColour = async (lights, job) => {
 
 const executeRotate = async (lights, job) => {
 	const api = await getApi();
-	const groups = lights.length;
+	const length = job.action.length ? job.action.length : lights.length;
 
-	const rot = job.invocation % 360
+	const step = job.action.step ? job.action.step : 10;
+
+	const rot = (job.invocation*step) % 360
 	const startColour = '#' + convertColor.hsv.hex(rot, 100, 100);
 
 	const c = [startColour]
-	for (let i=1;i<groups;i++) {
+	for (let i=1;i<length;i++) {
 		c.push('offset');
 	}
 
 	const colours = generateColors(c);
 
 	await Promise.all(lights.map((light, ix) => {
-		ix = ix % groups;
-		const c = colours[(job.invocation + ix) % colours.length];
+		const c = colours[ix];
 
 		let state = new LightState()
 
