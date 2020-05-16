@@ -79,6 +79,9 @@ const execute = async (key, job) => {
 			case 'random':
 				await executeRandom(actionLights, job);
 				break;
+			case 'rotate':
+				await executeRotate(actionLights, job);
+				break;
 			case 'pollSensors':
 				await poll();
 				break;
@@ -201,6 +204,51 @@ const executeColour = async (lights, job) => {
 		return api.lights.setLightState(light.id, state)
 	}));
 };
+
+const executeRotate = async (lights, job) => {
+	const api = await getApi();
+	const groups = lights.length;
+
+	const rot = job.invocation % 360
+	const startColour = '#' + convertColor.hsv.hex(rot, 100, 100);
+
+	const c = [startColour]
+	for (let i=1;i<groups;i++) {
+		c.push('offset');
+	}
+
+	const colours = generateColors(c);
+
+	await Promise.all(lights.map((light, ix) => {
+		ix = ix % groups;
+		const c = colours[(job.invocation + ix) % colours.length];
+
+		let state = new LightState()
+
+		if (!light.state.on) {
+			if (job.action.on) {
+				state = state.on();
+			} else {
+				return Promise.resolve();
+			}
+		}
+
+		if (job.action.brightness) {
+			state = state.brightness(job.action.brightness);
+		}
+
+		if (light.state.colormode === "xy") {
+			state = state.rgb(c.rgb)
+		}
+
+		if (job.action.transition) {
+			state = state.transition(job.action.transition)
+		}
+
+		return api.lights.setLightState(light.id, state)
+	}));
+}
+
 
 export default {
 	api: getApi,

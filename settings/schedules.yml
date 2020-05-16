@@ -29,26 +29,27 @@ lights:
   KITCHEN_R: Kitchen Cupboard Right
   KITCHEN_L: Kitchen Cupboard Left
 
+  SOFA_1: Sofa 1
+  SOFA_2: Sofa 2
+  SOFA_3: Sofa 3
+  SOFA_4: Sofa 4
+
 schedules:
-  sensors:
-    cron: '* * * * * *'
-    action:
-      method: pollSensors
+#  sensors:
+#    cron: '* * * * * *'
+#    action:
+#      method: pollSensors
 
   colour:
     cron: '*/5 * * * * *'
     action:
-      method: colour
-#      on: true
-#      brightness: 100
-#      groups: 2
-      colours:
-        - sky
-        - yellow
+      method: rotate
       lights:
-        - CUPBOARD_BOTTOM
-        - CUPBOARD_TOP
-      transition: 250
+        - SOFA_1
+        - SOFA_2
+        - SOFA_3
+        - SOFA_4
+      transition: 5000
 
 
 #  random:
