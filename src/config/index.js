@@ -8,7 +8,7 @@ const { pathname } = new URL(import.meta.url);
 const discovery = hue.v3.discovery;
 
 async function discoverBridge() {
-  const discoveryResults = await discovery.nupnpSearch();
+  const discoveryResults = await discovery.upnpSearch();
 
   if (discoveryResults.length === 0) {
     console.error('Failed to resolve any Hue Bridges');

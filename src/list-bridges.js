@@ -4,12 +4,15 @@ const displayBridges = function(bridges) {
 	console.log("Hue Bridges Found: " + JSON.stringify(bridges));
 };
 
-const searchBridges = async () => {
-	const bridges = await hue.v3.discovery.nupnpSearch();
-	return bridges
+const searchBridges = async mode => {
+	if (mode === 'local' || mode === 'upnp') {
+		return await hue.v3.discovery.upnpSearch();
+	} else {
+		return await hue.v3.discovery.nupnpSearch();
+	}
 };
 
-searchBridges().then(displayBridges);
+searchBridges('local').then(displayBridges);
 
 
 
