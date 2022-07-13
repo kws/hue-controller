@@ -1,4 +1,4 @@
-FROM node:13.2-alpine
+FROM node:16.16-alpine
 
 RUN apk add -U tzdata
 
