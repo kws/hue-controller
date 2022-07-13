@@ -1,9 +1,12 @@
 import sqlite3 from 'sqlite3';
 import { createLogObject } from './csv.js';
 
+const SQL_PROPERTIES = [
+    'event_id', 'date', 'id', 'name', 'type', 'value', 'battery', 'dark', 'daylight'
+]
 const SQL = `
-    INSERT INTO log (event_id, date, id, name, type, value, battery, dark, daylight) 
-    VALUES ($event_id, $date, $id, $name, $type, $value, $battery, $dark, $daylight)
+    INSERT INTO log (${SQL_PROPERTIES.join(", ")}) 
+    VALUES (${SQL_PROPERTIES.map(v => `\$${v}`).join(", ")})
 `;
 
 export default class SQLiteLogger {
@@ -26,15 +29,21 @@ export default class SQLiteLogger {
     log = s => {
         const msg = createLogObject(s);
         if (msg.type) {
-            const dbInsert = {};
+            const dbInsert = SQL_PROPERTIES.reduce((pv, cv) => {
+                pv[`\$${cv}`] = '';
+                return pv;
+            }, {});
             for (const property in msg) {
-                dbInsert[`$${property}`] = msg[property];
+                if (msg[property] != null) {
+                    dbInsert[`$${property}`] = msg[property];
+                }
             }
-            try {
-                this.db.run(SQL, dbInsert);
-            } catch (err) {
-                console.exception("Could not insert log line", dbInsert)
-            }
+            this.db.run(SQL, dbInsert, (err) => {
+                if (err) {
+                    console.log("Error while executing", dbInsert)
+                    return console.error(err)
+                }
+            });
         }
     };
 }
