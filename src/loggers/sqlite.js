@@ -30,7 +30,11 @@ export default class SQLiteLogger {
             for (const property in msg) {
                 dbInsert[`$${property}`] = msg[property];
             }
-            this.db.run(SQL, dbInsert);
+            try {
+                this.db.run(SQL, dbInsert);
+            } catch (err) {
+                console.exception("Could not insert log line", dbInsert)
+            }
         }
     };
 }
