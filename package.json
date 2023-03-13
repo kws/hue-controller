@@ -29,7 +29,7 @@
     "parse-color": "^1.0.0",
     "process": "latest",
     "serve-favicon": "~2.3.0",
-    "sqlite3": "^5.0.8",
+    "sqlite3": "^5.1.5",
     "uuid": "~7.0.2"
   },
   "resolutions": {
